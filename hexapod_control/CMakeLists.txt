@@ -13,6 +13,7 @@ find_package(hexapod_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
 find_package(tf2_ros REQUIRED)
 
 add_library(control_node SHARED src/control_node.cpp)
@@ -22,7 +23,7 @@ target_include_directories(control_node PUBLIC
 )
 ament_target_dependencies(control_node
   rclcpp rclcpp_lifecycle rclcpp_components
-  hexapod_msgs sensor_msgs geometry_msgs std_msgs tf2_ros
+  hexapod_msgs sensor_msgs geometry_msgs std_msgs nav_msgs tf2_ros
 )
 
 rclcpp_components_register_node(control_node
