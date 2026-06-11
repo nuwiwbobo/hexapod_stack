@@ -1,0 +1,61 @@
+# Reignblaze Hexapod Configuration — ROS 2 Format
+
+hexapod_control:
+  master_loop_rate: 500
+  interpolation_loop_rate: 1000
+  velocity_division: 0.033
+
+hexapod_gait:
+  gait_style: "TRIPOD"
+  cycle_length: 50
+  lift_height: 0.0375
+  velocity_scaling: 0.15
+  low_pass_alpha: 0.05
+
+hexapod_ik:
+  number_of_legs: 6
+  number_of_leg_segments: 3
+  coxa_length: 0.044
+  femur_length: 0.0545
+  tibia_length: 0.1019
+  tarsus_length: 0.0
+  standing_body_height: 0.02
+  body_max_roll: 0.1396   # 8 deg
+  body_max_pitch: 0.1396  # 8 deg
+  body_max_yaw: 0.3491    # 20 deg
+
+  init_coxa_angle: [-0.4581, 0.0, 0.4581, -0.4581, 0.0, 0.4581]  # radians (-26.25, 0, 26.25, -26.25, 0, 26.25)
+  coxa_to_center_x: [-0.065, 0.0, 0.065, -0.065, 0.0, 0.065]
+  coxa_to_center_y: [0.0325, 0.0625, 0.0325, 0.0325, 0.0625, 0.0325]
+  init_foot_pos_x: [-0.04190685, 0.0, 0.04190685, -0.04190685, 0.0, 0.04190685]
+  init_foot_pos_y: [0.084978692, 0.09475, 0.084978692, 0.084978692, 0.09475, 0.084978692]
+  init_foot_pos_z: [0.07, 0.07, 0.07, 0.07, 0.07, 0.07]
+
+hexapod_servo:
+  port: "/dev/ttyUSB0"
+  baud_rate: 1000000
+  protocol_version: 1.0
+  servo_count: 18
+  torque_enable: 24
+  present_position_l: 36
+  goal_position_l: 30
+
+  servos:
+    coxa_joint_RR:  { id: 8,  ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.3142 }
+    femur_joint_RR: { id: 10, ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.0 }
+    tibia_joint_RR: { id: 12, ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.7156 }
+    coxa_joint_RM:  { id: 14, ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.0 }
+    femur_joint_RM: { id: 16, ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.0 }
+    tibia_joint_RM: { id: 18, ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.7156 }
+    coxa_joint_RF:  { id: 2,  ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.3142 }
+    femur_joint_RF: { id: 4,  ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.0 }
+    tibia_joint_RF: { id: 6,  ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.7156 }
+    coxa_joint_LR:  { id: 7,  ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.3142 }
+    femur_joint_LR: { id: 9,  ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.0 }
+    tibia_joint_LR: { id: 11, ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.7156 }
+    coxa_joint_LM:  { id: 13, ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.0 }
+    femur_joint_LM: { id: 15, ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.0 }
+    tibia_joint_LM: { id: 17, ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.7156 }
+    coxa_joint_LF:  { id: 1,  ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.3142 }
+    femur_joint_LF: { id: 3,  ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.0 }
+    tibia_joint_LF: { id: 5,  ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.7156 }
