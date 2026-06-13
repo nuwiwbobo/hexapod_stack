@@ -58,3 +58,22 @@ TEST_F(ServoDriverTest, SignHandling) {
   uint16_t t2 = d.radianToTick(M_PI / 4.0, 1);
   EXPECT_NEAR(t1 + t2, 2 * 512u, 2);
 }
+
+TEST_F(ServoDriverTest, ServoConfigCount) {
+  EXPECT_EQ(driver_->getServoCount(), 2u);
+  ServoDriver d({makeAX18A(1), makeAX18A(2), makeAX18A(3)});
+  EXPECT_EQ(d.getServoCount(), 3u);
+}
+
+TEST_F(ServoDriverTest, MultipleServos) {
+  ServoDriver d({
+      makeAX18A(1, 0.0, 1),
+      makeAX18A(2, 0.0, -1),
+      makeAX18A(3, 0.1, 1),
+  });
+  EXPECT_EQ(d.getServoCount(), 3u);
+
+  EXPECT_EQ(d.radianToTick(0.0, 0), 512);
+  EXPECT_EQ(d.radianToTick(0.0, 1), 512);
+  EXPECT_NE(d.radianToTick(0.0, 2), 512);
+}
