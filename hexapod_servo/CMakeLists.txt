@@ -11,7 +11,7 @@ find_package(rclcpp_lifecycle REQUIRED)
 find_package(rclcpp_components REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
-find_package(dynamixel_sdk QUIET)
+find_package(dynamixel_sdk REQUIRED)
 find_package(yaml-cpp REQUIRED)
 
 add_library(servo_driver SHARED src/servo_driver.cpp)
@@ -19,10 +19,7 @@ target_include_directories(servo_driver PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   $<INSTALL_INTERFACE:include>
 )
-ament_target_dependencies(servo_driver rclcpp sensor_msgs)
-if(dynamixel_sdk_FOUND)
-  ament_target_dependencies(servo_driver dynamixel_sdk)
-endif()
+ament_target_dependencies(servo_driver rclcpp sensor_msgs dynamixel_sdk)
 
 add_library(servo_node SHARED src/servo_node.cpp)
 target_include_directories(servo_node PUBLIC

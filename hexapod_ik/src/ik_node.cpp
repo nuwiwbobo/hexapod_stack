@@ -20,6 +20,12 @@ IkNode::on_configure(const rclcpp_lifecycle::State &)
   declare_parameter("femur_length", 0.0545);
   declare_parameter("tibia_length", 0.1019);
   declare_parameter("tarsus_length", 0.0);
+  declare_parameter("init_coxa_angle", std::vector<double>{});
+  declare_parameter("coxa_to_center_x", std::vector<double>{});
+  declare_parameter("coxa_to_center_y", std::vector<double>{});
+  declare_parameter("init_foot_pos_x", std::vector<double>{});
+  declare_parameter("init_foot_pos_y", std::vector<double>{});
+  declare_parameter("init_foot_pos_z", std::vector<double>{});
 
   ik_params_.number_of_legs = get_parameter("number_of_legs").as_int();
   ik_params_.coxa_length = get_parameter("coxa_length").as_double();

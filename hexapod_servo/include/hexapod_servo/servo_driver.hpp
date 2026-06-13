@@ -5,6 +5,8 @@
 #include <string>
 #include <cstdint>
 
+#include <dynamixel_sdk/dynamixel_sdk.h>
+
 namespace hexapod_servo
 {
 
@@ -51,8 +53,8 @@ public:
 
 private:
   ServoParams params_;
-  void * port_handler_ = nullptr;
-  void * packet_handler_ = nullptr;
+  dynamixel::PortHandler * port_handler_ = nullptr;
+  dynamixel::PacketHandler * packet_handler_ = nullptr;
   bool port_open_ = false;
   std::vector<double> rad_to_servo_resolution_;
 };
