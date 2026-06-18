@@ -28,7 +28,7 @@ protected:
     servo.type = "AX-18A";
     servo.ticks = 1024;
     servo.center = 512;
-    servo.max_radians = M_PI;
+    servo.max_radians = 5.236;  // 300 degrees for AX-18A
     servo.offset = 0.0;
     servo.sign = 1;
     servos_.push_back(servo);
@@ -87,7 +87,7 @@ TEST_F(ServoDriverTest, SignHandling) {
   servo_neg.type = "AX-18A";
   servo_neg.ticks = 1024;
   servo_neg.center = 512;
-  servo_neg.max_radians = M_PI;
+  servo_neg.max_radians = 5.236;  // 300 degrees for AX-18A
   servo_neg.offset = 0.0;
   servo_neg.sign = -1;
   std::vector<ServoConfig> servos_neg = {servo_neg};

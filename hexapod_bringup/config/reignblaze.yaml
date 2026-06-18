@@ -1,53 +1,52 @@
 # =============================================================================
-# Task 8: Reignblaze Hexapod Configuration
+# Reignblaze Hexapod Configuration
 # =============================================================================
 # Servo configuration for 18 Dynamixel AX servos (6 legs × 3 servos)
+# Source: ROS 1 stack (hexapod_controller/config/reignblaze.yaml)
 #
-# Servo mapping (from ROS 1 stack):
-#   Coxa servos: AX-12A (IDs 7-13, even/odd varies)
-#   Femur/Tibia servos: AX-18A (IDs 1-6, 11-18)
+# Servo mapping:
+#   Left side (LR, LM, LF): coxa sign=+1, femur sign=+1, tibia sign=-1
+#   Right side (RR, RM, RF): coxa sign=-1, femur sign=-1, tibia sign=+1
 #
-# Sign convention:
-#   +1 = normal mounting
-#   -1 = reversed mounting (flips direction)
-#
-# Offset:
-#   Hardware offset in radians (usually 0.0, adjust per servo)
+# AX-18A specs:
+#   - Ticks: 1024 (0-1023 range)
+#   - Center: 512
+#   - Max range: 300° (5.236 rad)
 
 hexapod_servo:
   port: "/dev/ttyUSB0"
   baud_rate: 1000000
   protocol_version: 1.0
   servos:
-    # Left Front leg
-    coxa_joint_LF:  { id: 7,  type: "AX-12A", ticks: 1024, center: 512, offset: 0.0, sign: 1 }
-    femur_joint_LF: { id: 1,  type: "AX-18A", ticks: 1024, center: 512, offset: 0.0, sign: -1 }
-    tibia_joint_LF: { id: 2,  type: "AX-18A", ticks: 1024, center: 512, offset: 0.0, sign: 1 }
-
-    # Right Front leg
-    coxa_joint_RF:  { id: 8,  type: "AX-12A", ticks: 1024, center: 512, offset: 0.0, sign: -1 }
-    femur_joint_RF: { id: 3,  type: "AX-18A", ticks: 1024, center: 512, offset: 0.0, sign: 1 }
-    tibia_joint_RF: { id: 4,  type: "AX-18A", ticks: 1024, center: 512, offset: 0.0, sign: -1 }
-
-    # Left Middle leg
-    coxa_joint_LM:  { id: 9,  type: "AX-12A", ticks: 1024, center: 512, offset: 0.0, sign: 1 }
-    femur_joint_LM: { id: 5,  type: "AX-18A", ticks: 1024, center: 512, offset: 0.0, sign: -1 }
-    tibia_joint_LM: { id: 6,  type: "AX-18A", ticks: 1024, center: 512, offset: 0.0, sign: 1 }
+    # Right Rear leg
+    coxa_joint_RR:  { id: 10, type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.0 }
+    femur_joint_RR: { id: 11, type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.0 }
+    tibia_joint_RR: { id: 12, type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.0 }
 
     # Right Middle leg
-    coxa_joint_RM:  { id: 10, type: "AX-12A", ticks: 1024, center: 512, offset: 0.0, sign: -1 }
-    femur_joint_RM: { id: 11, type: "AX-18A", ticks: 1024, center: 512, offset: 0.0, sign: 1 }
-    tibia_joint_RM: { id: 12, type: "AX-18A", ticks: 1024, center: 512, offset: 0.0, sign: -1 }
+    coxa_joint_RM:  { id: 16, type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.0 }
+    femur_joint_RM: { id: 17, type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.0 }
+    tibia_joint_RM: { id: 18, type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.0 }
+
+    # Right Front leg
+    coxa_joint_RF:  { id: 7,  type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.0 }
+    femur_joint_RF: { id: 8,  type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.0 }
+    tibia_joint_RF: { id: 9,  type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.0 }
 
     # Left Rear leg
-    coxa_joint_LR:  { id: 13, type: "AX-12A", ticks: 1024, center: 512, offset: 0.0, sign: 1 }
-    femur_joint_LR: { id: 14, type: "AX-18A", ticks: 1024, center: 512, offset: 0.0, sign: -1 }
-    tibia_joint_LR: { id: 15, type: "AX-18A", ticks: 1024, center: 512, offset: 0.0, sign: 1 }
+    coxa_joint_LR:  { id: 1,  type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.0 }
+    femur_joint_LR: { id: 2,  type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.0 }
+    tibia_joint_LR: { id: 3,  type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.0 }
 
-    # Right Rear leg
-    coxa_joint_RR:  { id: 16, type: "AX-12A", ticks: 1024, center: 512, offset: 0.0, sign: -1 }
-    femur_joint_RR: { id: 17, type: "AX-18A", ticks: 1024, center: 512, offset: 0.0, sign: 1 }
-    tibia_joint_RR: { id: 18, type: "AX-18A", ticks: 1024, center: 512, offset: 0.0, sign: -1 }
+    # Left Middle leg
+    coxa_joint_LM:  { id: 13, type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.0 }
+    femur_joint_LM: { id: 14, type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.0 }
+    tibia_joint_LM: { id: 15, type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.0 }
+
+    # Left Front leg
+    coxa_joint_LF:  { id: 4,  type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.0 }
+    femur_joint_LF: { id: 5,  type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.0 }
+    tibia_joint_LF: { id: 6,  type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.0 }
 
 hexapod_ik:
   coxa_length: 0.044      # meters

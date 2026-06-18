@@ -26,7 +26,7 @@ struct ServoConfig {
   std::string type;         // "AX-12A" or "AX-18A"
   int ticks;                // Total tick range (1024 for AX-18A)
   int center;               // Center tick value (512 for AX-18A)
-  double max_radians;       // Max rotation in radians (M_PI for 180°)
+  double max_radians;       // Max rotation in radians (5.236 for 300° AX-18A)
   double offset;            // Hardware offset in radians
   int sign;                 // +1 or -1 (flips direction for reversed mounting)
 };
