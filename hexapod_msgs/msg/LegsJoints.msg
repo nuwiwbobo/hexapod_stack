@@ -1,1 +1,0 @@
-hexapod_msgs/LegJoints[6] leg
