@@ -2,78 +2,89 @@
 #define HEXAPOD_SERVO__SERVO_DRIVER_HPP_
 
 // =============================================================================
-// Task 1: Bare ServoDriver class (no ROS dependency)
+// Task 2: ServoDriver with hardware control via dynamixel_sdk
 // =============================================================================
-// This class handles Dynamixel AX servo communication.
-// It converts between radians and servo ticks, and manages servo configs.
-//
-// Implementation order:
-//   1. ServoConfig struct (below)
-//   2. ServoDriver class with radianToTick/tickToRadian
-//   3. Unit tests in test/test_servo_driver.cpp
-//
-// Reference: ROS 1 servo driver at /home/wawabobo/ROS-package/hexapod_controller/include/servo_driver.h
+// Wraps Dynamixel Protocol 1.0 communication for AX-series servos.
+// Unit conversion (radianToTick / tickToRadian) has no SDK dependency.
+// Hardware methods require openPort() first.
 
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
+// Forward-declare SDK types to keep this header ROS-free
+namespace dynamixel {
+  class PortHandler;
+  class PacketHandler;
+}
+
 namespace hexapod_servo {
 
-// Servo configuration for a single Dynamixel AX servo
+// AX-series register addresses (Protocol 1.0)
+namespace ax_reg {
+  constexpr int TORQUE_ENABLE = 24;
+  constexpr int TORQUE_LIMIT  = 34;
+  constexpr int MOVING_SPEED  = 32;
+  constexpr int GOAL_POS      = 30;
+  constexpr int PRESENT_POS   = 36;
+  constexpr int MOVING        = 46;
+}
+
 struct ServoConfig {
   int id;                   // Dynamixel servo ID (1-254)
   std::string type;         // "AX-12A" or "AX-18A"
-  int ticks;                // Total tick range (1024 for AX-18A)
-  int center;               // Center tick value (512 for AX-18A)
-  double max_radians;       // Max rotation in radians (5.236 for 300° AX-18A)
-  double offset;            // Hardware offset in radians
+  int ticks;                // Total tick range (1024 for AX series)
+  int center;               // Center tick value (512)
+  double max_radians;       // Logical range in radians (use 2*pi convention)
+  double offset;            // Hardware zero offset in radians
   int sign;                 // +1 or -1 (flips direction for reversed mounting)
 };
 
 class ServoDriver {
 public:
   explicit ServoDriver(const std::vector<ServoConfig>& servos);
+  ~ServoDriver();
 
-  // =========================================================================
-  // TODO: Implement these methods
-  // =========================================================================
-
-  // Convert radian angle to servo tick value
-  // Formula: tick = center + round((radian - sign * offset) * (ticks / max_radians))
-  // Clamp result to [0, ticks]
+  // ---------------------------------------------------------------------------
+  // Unit conversion (no hardware dependency)
+  // ---------------------------------------------------------------------------
   uint16_t radianToTick(double radian, int servo_index) const;
+  double   tickToRadian(uint16_t tick, int servo_index) const;
+  size_t   getServoCount() const;
 
-  // Convert servo tick value back to radians
-  // Formula: radian = (tick - center) / (ticks / max_radians) + sign * offset
-  double tickToRadian(uint16_t tick, int servo_index) const;
+  // ---------------------------------------------------------------------------
+  // Hardware control (call openPort() first)
+  // ---------------------------------------------------------------------------
 
-  // Get number of configured servos
-  size_t getServoCount() const;
+  // Open U2D2 connection. port = "/dev/ttyUSB0", baud = 1000000
+  bool openPort(const std::string& port = "/dev/ttyUSB0", int baud = 1000000);
+  void closePort();
+  bool isOpen() const { return port_open_; }
 
-  // =========================================================================
-  // TODO: Implement these methods for hardware control (Task 2+)
-  // =========================================================================
+  // Torque — applies to ALL configured servos
+  bool enableTorque(int moving_speed = 100, int torque_limit = 300);
+  bool disableTorque();
 
-  // Open connection to U2D2 adapter
-  // bool openPort(const std::string& port = "/dev/ttyUSB0", int baud = 1000000);
-  // void closePort();
+  // Set goal position for one servo (by servo_index, not ID)
+  bool setGoalPosition(int servo_index, double radians);
 
-  // Enable/disable servo torque
-  // bool enableTorque();
-  // bool disableTorque();
+  // Set goal positions for all servos in one pass
+  bool setGoalPositions(const std::vector<double>& radians);
 
-  // Set goal position (radians) for one or all servos
-  // bool setGoalPosition(int servo_id, double radians);
-  // bool setGoalPositions(const std::vector<double>& radians);
+  // Read present position of one servo (returns NaN on error)
+  double readPosition(int servo_index);
 
-  // Read current position from servo
-  // double readPosition(int servo_id);
-  // std::vector<double> readPositions();
+  // Read all servo positions (NaN entries on error)
+  std::vector<double> readPositions();
 
 private:
   std::vector<ServoConfig> servos_;
-  std::vector<double> rad_to_servo_resolution_;  // Precomputed: ticks / max_radians
+  std::vector<double>      resolution_;   // precomputed ticks / max_radians
+  bool                     port_open_{false};
+
+  dynamixel::PortHandler*   port_handler_{nullptr};
+  dynamixel::PacketHandler* packet_handler_{nullptr};
 };
 
 }  // namespace hexapod_servo

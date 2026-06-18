@@ -10,35 +10,36 @@ find_package(ament_cmake REQUIRED)
 # =============================================================================
 # Task 5: IK Solver library (pure math, no ROS dependency)
 # =============================================================================
-# TODO: Uncomment when implementing ik_solver.cpp
-# add_library(ik_solver SHARED src/ik_solver.cpp)
-# target_include_directories(ik_solver PUBLIC
-#   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-#   $<INSTALL_INTERFACE:include>
-# )
+add_library(ik_solver SHARED src/ik_solver.cpp)
+target_include_directories(ik_solver PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>
+)
+target_compile_features(ik_solver PUBLIC cxx_std_17)
 
 # =============================================================================
 # Task 5: Unit tests for IK solver
 # =============================================================================
-# TODO: Uncomment when implementing test_ik_solver.cpp
-# if(BUILD_TESTING)
-#   find_package(ament_cmake_gtest REQUIRED)
-#   ament_add_gtest(test_ik_solver test/test_ik_solver.cpp)
-#   target_link_libraries(test_ik_solver ik_solver)
-# endif()
+if(BUILD_TESTING)
+  find_package(ament_cmake_gtest REQUIRED)
+  ament_add_gtest(test_ik_solver test/test_ik_solver.cpp)
+  target_link_libraries(test_ik_solver ik_solver)
+  target_include_directories(test_ik_solver PRIVATE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  )
+endif()
 
 # =============================================================================
-# Task 5: Install targets
+# Install targets
 # =============================================================================
-# TODO: Uncomment when you have library targets
-# install(TARGETS ik_solver
-#   ARCHIVE DESTINATION lib
-#   LIBRARY DESTINATION lib
-#   RUNTIME DESTINATION lib/${PROJECT_NAME}
-# )
-#
-# install(DIRECTORY include/
-#   DESTINATION include
-# )
+install(TARGETS ik_solver
+  ARCHIVE DESTINATION lib
+  LIBRARY DESTINATION lib
+  RUNTIME DESTINATION lib/${PROJECT_NAME}
+)
+
+install(DIRECTORY include/
+  DESTINATION include
+)
 
 ament_package()
