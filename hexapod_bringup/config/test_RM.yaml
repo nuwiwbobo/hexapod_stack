@@ -1,0 +1,14 @@
+# Right Middle leg — IDs 16, 17, 18
+hexapod_servo:
+  port: "/dev/ttyUSB0"
+  baud_rate: 1000000
+  servos:
+    coxa_joint_RM:  { id: 16, type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.00614 }
+    femur_joint_RM: { id: 17, type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.00614 }
+    tibia_joint_RM: { id: 18, type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: 1,  offset: 0.00614 }
+
+hexapod_ik:
+  coxa_length: 0.044
+  femur_length: 0.0545
+  tibia_length: 0.1019
+  joint_names: ["coxa_joint_RM", "femur_joint_RM", "tibia_joint_RM"]

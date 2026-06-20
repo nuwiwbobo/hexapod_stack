@@ -2,37 +2,32 @@
 #define HEXAPOD_CONTROL__CONTROL_NODE_HPP_
 
 // =============================================================================
-// Task 7: Control Orchestrator Node
+// Control Orchestrator Node
 // =============================================================================
-// Orchestrates the full pipeline: cmd_vel → gait → IK → servo
+// Orchestrates: cmd_vel → gait → IK → /joint_targets
 //
-// Data flow (single process, intra-process composable):
-//   cmd_vel (Twist)
+// Data flow:
+//   /cmd_vel (Twist)
 //        │
 //        ▼
 //   GaitGenerator::step()  →  FootCommand[6]
 //        │
 //        ▼
-//   IkSolver::solve()  →  LegJoints[6]
+//   IkSolver::solve() × 6  →  LegJoints[6]  (18 joint angles)
 //        │
 //        ▼
-//   ServoDriver::setGoalPositions()  →  hardware
+//   publish /joint_targets (JointState, 18 joints)
 //
-// Topics:
-//   /cmd_vel (Twist) — input from teleop
-//   /joint_states (JointState) — output to ros2_control
-//
-// Build order:
-//   1. Complete Tasks 1-6 (servo, msgs, ik, gait)
-//   2. Implement control_node.hpp/cpp
-//   3. Write integration test in test/test_control_node.cpp
-//   4. Uncomment CMakeLists.txt targets
+// No ServoDriver — hardware handled by servo_node via /joint_targets topic.
+
+#include <array>
+#include <string>
+#include <vector>
 
 #include <rclcpp/rclcpp.hpp>
 #include <geometry_msgs/msg/twist.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
 
-#include <hexapod_servo/servo_driver.hpp>
 #include <hexapod_ik/ik_solver.hpp>
 #include <hexapod_gait/gait_generator.hpp>
 
@@ -46,15 +41,27 @@ private:
   void cmdVelCallback(const geometry_msgs::msg::Twist::SharedPtr msg);
   void controlLoop();
 
-  hexapod_servo::ServoDriver servo_driver_;
-  hexapod_ik::IkSolver ik_solver_;
+  // Gait generator
   hexapod_gait::GaitGenerator gait_generator_;
 
-  rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_sub_;
-  rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_pub_;
-  rclcpp::TimerBase::SharedPtr control_timer_;
+  // 6 IK solvers (one per leg, same params)
+  std::array<hexapod_ik::IkSolver, 6> ik_solvers_;
 
-  double cmd_vx_, cmd_vy_, cmd_angular_;
+  // Joint name mapping: [leg_index][joint_index(0=coxa,1=femur,2=tibia)]
+  std::array<std::array<std::string, 3>, 6> joint_names_;
+
+  // Flat list of all 18 joint names (for JointState message)
+  std::vector<std::string> all_joint_names_;
+
+  // cmd_vel storage
+  double cmd_vx_{0.0};
+  double cmd_vy_{0.0};
+  double cmd_angular_{0.0};
+
+  // ROS
+  rclcpp::Subscription<geometry_msgs::msg::Twist>::SharedPtr cmd_vel_sub_;
+  rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_pub_;
+  rclcpp::TimerBase::SharedPtr control_timer_;
 };
 
 }  // namespace hexapod_control

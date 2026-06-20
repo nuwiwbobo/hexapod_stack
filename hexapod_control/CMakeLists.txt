@@ -7,55 +7,37 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(rclcpp_components REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
-find_package(hexapod_servo REQUIRED)
-find_package(hexapod_ik REQUIRED)
-find_package(hexapod_gait REQUIRED)
+find_package(yaml-cpp REQUIRED)
+
+# Find installed libraries from hexapod_ik and hexapod_gait
+find_library(IK_SOLVER_LIB ik_solver PATHS ${CMAKE_SOURCE_DIR}/../hexapod_ik)
+find_library(GAIT_GEN_LIB gait_generator PATHS ${CMAKE_SOURCE_DIR}/../hexapod_gait)
 
 # =============================================================================
-# Task 7: Control Orchestrator node
+# Control Orchestrator node
 # =============================================================================
-# TODO: Uncomment when implementing control_node.cpp
-#
-# add_library(control_node SHARED src/control_node.cpp)
-# target_include_directories(control_node PUBLIC
-#   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-#   $<INSTALL_INTERFACE:include>
-# )
-# ament_target_dependencies(control_node
-#   rclcpp rclcpp_components geometry_msgs sensor_msgs
-#   hexapod_servo hexapod_ik hexapod_gait
-# )
-#
-# rclcpp_components_register_node(control_node
-#   PLUGIN "hexapod_control::ControlNode"
-#   EXECUTABLE control_node_exec
-# )
+add_executable(control_node_exec src/control_node.cpp)
+target_include_directories(control_node_exec PRIVATE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/../hexapod_ik/include>
+  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/../hexapod_gait/include>
+)
+target_link_libraries(control_node_exec ${IK_SOLVER_LIB} ${GAIT_GEN_LIB} yaml-cpp)
+ament_target_dependencies(control_node_exec
+  rclcpp geometry_msgs sensor_msgs
+)
 
 # =============================================================================
-# Task 9: Integration test
+# Install
 # =============================================================================
-# TODO: Uncomment when implementing test_control_node.cpp
-# if(BUILD_TESTING)
-#   find_package(ament_cmake_gtest REQUIRED)
-#   ament_add_gtest(test_control_node test/test_control_node.cpp)
-#   target_link_libraries(test_control_node control_node)
-# endif()
+install(TARGETS control_node_exec
+  RUNTIME DESTINATION lib/${PROJECT_NAME}
+)
 
-# =============================================================================
-# Install targets
-# =============================================================================
-# TODO: Uncomment when you have library targets
-# install(TARGETS control_node
-#   ARCHIVE DESTINATION lib
-#   LIBRARY DESTINATION lib
-#   RUNTIME DESTINATION lib/${PROJECT_NAME}
-# )
-#
-# install(DIRECTORY include/
-#   DESTINATION include
-# )
+install(DIRECTORY include/
+  DESTINATION include
+)
 
 ament_package()

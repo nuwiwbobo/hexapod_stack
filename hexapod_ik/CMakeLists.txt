@@ -8,7 +8,7 @@ endif()
 find_package(ament_cmake REQUIRED)
 
 # =============================================================================
-# Task 5: IK Solver library (pure math, no ROS dependency)
+# IK Solver library (pure math, no ROS dependency)
 # =============================================================================
 add_library(ik_solver SHARED src/ik_solver.cpp)
 target_include_directories(ik_solver PUBLIC
@@ -18,7 +18,7 @@ target_include_directories(ik_solver PUBLIC
 target_compile_features(ik_solver PUBLIC cxx_std_17)
 
 # =============================================================================
-# Task 5: Unit tests for IK solver
+# Unit tests for IK solver
 # =============================================================================
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
@@ -30,9 +30,24 @@ if(BUILD_TESTING)
 endif()
 
 # =============================================================================
-# Install targets
+# ROS node (IK → /joint_targets)
 # =============================================================================
-install(TARGETS ik_solver
+find_package(rclcpp REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(yaml-cpp REQUIRED)
+
+add_executable(ik_node_exec src/ik_node.cpp)
+target_include_directories(ik_node_exec PRIVATE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+target_link_libraries(ik_node_exec ik_solver yaml-cpp)
+ament_target_dependencies(ik_node_exec rclcpp sensor_msgs geometry_msgs)
+
+# =============================================================================
+# Install
+# =============================================================================
+install(TARGETS ik_solver ik_node_exec
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}

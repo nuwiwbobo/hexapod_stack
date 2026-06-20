@@ -9,12 +9,10 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <!-- TODO: Add these dependencies when implementing the ROS node wrapper (Task 3) -->
-  <!-- <depend>rclcpp</depend> -->
-  <!-- <depend>rclcpp_components</depend> -->
-  <!-- <depend>sensor_msgs</depend> -->
-  <!-- <depend>std_msgs</depend> -->
-  <!-- <depend>yaml-cpp</depend> -->
+  <depend>rclcpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>yaml-cpp</depend>
 
   <depend>dynamixel_sdk</depend>
 

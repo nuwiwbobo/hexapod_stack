@@ -1,27 +1,27 @@
 # =============================================================================
-# Launch: Full 6-leg hexapod with teleop control
+# Launch: Servo + IK test (3 servos, Left Rear leg)
 # =============================================================================
-# Starts servo_node (18 servos), control_node (gait+IK), and teleop keyboard.
+# Starts servo_node and ik_node with 3-servo config.
 #
 # Usage:
-#   ros2 launch hexapod_bringup reignblaze.launch.py
+#   ros2 launch hexapod_bringup test_servo_ik.launch.py
 #
-# Control:
-#   Use keyboard to send cmd_vel commands:
-#     i = forward, k = backward, j = left, l = right
-#     u/o = rotate left/right, q = quit
+# Then send foot positions:
+#   ros2 topic pub /foot_target geometry_msgs/msg/PointStamped "{
+#     header: {frame_id: 'body'},
+#     point: {x: 0.05, y: 0.12, z: -0.10}
+#   }"
 
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import ExecuteProcess
 
 
 def generate_launch_description():
     config_file = os.path.join(
         get_package_share_directory('hexapod_bringup'),
-        'config', 'reignblaze.yaml'
+        'config', 'test_3servo.yaml'
     )
 
     return LaunchDescription([
@@ -33,14 +33,10 @@ def generate_launch_description():
             output='screen'
         ),
         Node(
-            package='hexapod_control',
-            executable='control_node_exec',
-            name='control_node',
+            package='hexapod_ik',
+            executable='ik_node_exec',
+            name='ik_node',
             parameters=[{'config_file': config_file}],
-            output='screen'
-        ),
-        ExecuteProcess(
-            cmd=['ros2', 'run', 'teleop_twist_keyboard', 'teleop_twist_keyboard'],
             output='screen'
         ),
     ])

@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstring>
 #include <limits>
 #include <stdexcept>
 
@@ -67,6 +68,18 @@ bool ServoDriver::openPort(const std::string& port, int baud)
     port_handler_->closePort(); return false;
   }
   port_open_ = true;
+
+  // Create sync write/read objects (2 bytes per servo: GOAL_POS / PRESENT_POS)
+  sync_write_ = new dynamixel::GroupSyncWrite(
+    port_handler_, packet_handler_, ax_reg::GOAL_POS, 2);
+  sync_read_ = new dynamixel::GroupSyncRead(
+    port_handler_, packet_handler_, ax_reg::PRESENT_POS, 2);
+
+  // Register all servos with sync_read so we can batch-read them
+  for (const auto& s : servos_) {
+    sync_read_->addParam(s.id);
+  }
+
   return true;
 }
 
@@ -74,6 +87,8 @@ void ServoDriver::closePort()
 {
   if (port_open_ && port_handler_) {
     disableTorque();
+    delete sync_write_; sync_write_ = nullptr;
+    delete sync_read_;  sync_read_  = nullptr;
     port_handler_->closePort();
     port_open_ = false;
   }
@@ -131,11 +146,25 @@ bool ServoDriver::setGoalPosition(int servo_index, double radians)
 bool ServoDriver::setGoalPositions(const std::vector<double>& radians)
 {
   if (radians.size() != servos_.size()) return false;
-  bool ok = true;
+  if (!port_open_ || !sync_write_) return false;
+
+  // Clear previous parameters
+  sync_write_->clearParam();
+
+  // Pack all goal positions into the sync write packet
   for (size_t i = 0; i < servos_.size(); ++i) {
-    if (!setGoalPosition(static_cast<int>(i), radians[i])) ok = false;
+    uint16_t tick = radianToTick(radians[i], static_cast<int>(i));
+    uint8_t data[2] = {
+      static_cast<uint8_t>(tick & 0xFF),
+      static_cast<uint8_t>((tick >> 8) & 0xFF)
+    };
+    sync_write_->addParam(servos_[i].id, data);
   }
-  return ok;
+
+  // Send one packet to all servos
+  int rc = sync_write_->txPacket();
+  sync_write_->clearParam();
+  return (rc == COMM_SUCCESS);
 }
 
 // ---------------------------------------------------------------------------
@@ -155,7 +184,11 @@ double ServoDriver::readPosition(int servo_index)
 
 std::vector<double> ServoDriver::readPositions()
 {
-  std::vector<double> positions(servos_.size());
+  std::vector<double> positions(servos_.size(),
+    std::numeric_limits<double>::quiet_NaN());
+  if (!port_open_) return positions;
+
+  // Protocol 1.0 doesn't support sync read — use individual reads
   for (size_t i = 0; i < servos_.size(); ++i) {
     positions[i] = readPosition(static_cast<int>(i));
   }

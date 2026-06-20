@@ -7,6 +7,7 @@ endif()
 
 find_package(ament_cmake REQUIRED)
 find_package(dynamixel_sdk REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 # =============================================================================
 # ServoDriver library (unit conversion + hardware control)
@@ -32,31 +33,23 @@ if(BUILD_TESTING)
 endif()
 
 # =============================================================================
-# Task 3: ROS node wrapper
+# ROS node wrapper
 # =============================================================================
-# TODO: Uncomment when implementing servo_node.cpp
-# find_package(rclcpp REQUIRED)
-# find_package(rclcpp_components REQUIRED)
-# find_package(sensor_msgs REQUIRED)
-# find_package(std_msgs REQUIRED)
-#
-# add_library(servo_node SHARED src/servo_node.cpp)
-# target_include_directories(servo_node PUBLIC
-#   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-#   $<INSTALL_INTERFACE:include>
-# )
-# ament_target_dependencies(servo_node rclcpp rclcpp_components sensor_msgs std_msgs)
-# target_link_libraries(servo_node servo_driver)
-#
-# rclcpp_components_register_node(servo_node
-#   PLUGIN "hexapod_servo::ServoNode"
-#   EXECUTABLE servo_node_exec
-# )
+find_package(rclcpp REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
+
+add_executable(servo_node_exec src/servo_node.cpp)
+target_include_directories(servo_node_exec PRIVATE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+target_link_libraries(servo_node_exec servo_driver yaml-cpp)
+ament_target_dependencies(servo_node_exec rclcpp sensor_msgs std_msgs)
 
 # =============================================================================
 # Install
 # =============================================================================
-install(TARGETS servo_driver
+install(TARGETS servo_driver servo_node_exec
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}
