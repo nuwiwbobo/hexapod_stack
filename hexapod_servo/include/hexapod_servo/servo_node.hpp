@@ -22,6 +22,7 @@
 
 #include <hexapod_servo/servo_driver.hpp>
 
+#include <atomic>
 #include <memory>
 #include <string>
 #include <vector>
@@ -31,6 +32,7 @@ namespace hexapod_servo {
 class ServoNode : public rclcpp::Node {
 public:
   ServoNode();
+  ~ServoNode() override;
 
 private:
   void jointTargetCallback(const sensor_msgs::msg::JointState::SharedPtr msg);
@@ -39,6 +41,7 @@ private:
   std::vector<std::string> joint_names_;
   std::vector<double> last_targets_;
   bool port_open_{false};
+  std::atomic<bool> shutting_down_{false};
 
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr target_sub_;
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr state_pub_;

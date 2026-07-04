@@ -1,7 +1,7 @@
 # =============================================================================
 # Launch: Full 6-leg hexapod with teleop control
 # =============================================================================
-# Starts servo_node (18 servos), control_node (gait+IK), and teleop keyboard.
+# Starts servo_node (18 servos), control_node (gait+IK), teleop keyboard.
 #
 # Usage:
 #   ros2 launch hexapod_bringup reignblaze.launch.py

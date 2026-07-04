@@ -107,7 +107,7 @@ ServoNode::ServoNode()
 
   // --- Timer: read positions at 10 Hz ---
   publish_timer_ = create_wall_timer(100ms, [this]() {
-    if (!port_open_ || !driver_) return;
+    if (shutting_down_ || !port_open_ || !driver_) return;
 
     auto msg = sensor_msgs::msg::JointState();
     msg.header.stamp = now();
@@ -120,6 +120,15 @@ ServoNode::ServoNode()
   });
 
   RCLCPP_INFO(get_logger(), "ServoNode ready — listening on /joint_targets");
+}
+
+ServoNode::~ServoNode()
+{
+  shutting_down_ = true;
+  if (port_open_ && driver_) {
+    driver_->disableTorque();
+    driver_->closePort();
+  }
 }
 
 void ServoNode::jointTargetCallback(const sensor_msgs::msg::JointState::SharedPtr msg)

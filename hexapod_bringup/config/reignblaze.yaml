@@ -34,19 +34,19 @@ hexapod_servo:
     tibia_joint_RF: { id: 9,  type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.00614 }
 
     # Left Rear leg
-    coxa_joint_LR:  { id: 1,  type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.00614 }
-    femur_joint_LR: { id: 2,  type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.00614 }
-    tibia_joint_LR: { id: 3,  type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.00614 }
+    coxa_joint_LR:  { id: 1,  type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.00614 }
+    femur_joint_LR: { id: 2,  type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.00614 }
+    tibia_joint_LR: { id: 3,  type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.00614 }
 
     # Left Middle leg
-    coxa_joint_LM:  { id: 13, type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.00614 }
-    femur_joint_LM: { id: 14, type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.00614 }
-    tibia_joint_LM: { id: 15, type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.00614 }
+    coxa_joint_LM:  { id: 13, type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.00614 }
+    femur_joint_LM: { id: 14, type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.00614 }
+    tibia_joint_LM: { id: 15, type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.00614 }
 
     # Left Front leg
-    coxa_joint_LF:  { id: 4,  type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.00614 }
-    femur_joint_LF: { id: 5,  type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.00614 }
-    tibia_joint_LF: { id: 6,  type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.00614 }
+    coxa_joint_LF:  { id: 4,  type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.00614 }
+    femur_joint_LF: { id: 5,  type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: -1, offset: 0.00614 }
+    tibia_joint_LF: { id: 6,  type: "AX-18A", ticks: 1024, center: 512, max_radians: 5.236, sign: 1, offset: 0.00614 }
 
 hexapod_ik:
   coxa_length: 0.044      # meters

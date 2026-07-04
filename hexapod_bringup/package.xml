@@ -8,7 +8,17 @@
   <license>BSD</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>yaml-cpp</depend>
+  <depend>hexapod_ik</depend>
+  <depend>ament_index_cpp</depend>
   <depend>hexapod_control</depend>
+  <depend>hexapod_description</depend>
+  <depend>robot_state_publisher</depend>
+  <depend>joint_state_publisher</depend>
 
   <export>
     <build_type>ament_cmake</build_type>

@@ -1,52 +1,54 @@
 // =============================================================================
 // servo_driver.cpp
 // =============================================================================
-#include <hexapod_servo/servo_driver.hpp>
+#include <hexapod_servo/servo_driver.hpp> // Include the header file for the ServoDriver class
 
-#include <algorithm>
-#include <cmath>
-#include <cstring>
-#include <limits>
-#include <stdexcept>
+#include <algorithm> // For std::max and std::min
+#include <cmath>     // For std::round
+#include <cstring>   // For std::memcpy
+#include <limits>    // For std::numeric_limits
+#include <stdexcept>  // For std::invalid_argument
 
-#include <dynamixel_sdk/dynamixel_sdk.h>
+#include <dynamixel_sdk/dynamixel_sdk.h> // Include the Dynamixel SDK for communication with the servos
 
 namespace hexapod_servo {
 
 ServoDriver::ServoDriver(const std::vector<ServoConfig>& servos)
-: servos_(servos)
+: servos_(servos) // Precompute resolution (radians per tick) for each servo based on its configuration
 {
   if (servos_.empty()) {
     throw std::invalid_argument("ServoDriver: servo list must not be empty");
   }
-  resolution_.reserve(servos_.size());
+  resolution_.reserve(servos_.size()); // Preallocate resolution vector
   for (const auto& s : servos_) {
-    if (s.max_radians <= 0.0) {
+    if (s.max_radians <= 0.0) {        // Validate max_radians to prevent division by zero
       throw std::invalid_argument(
         "ServoDriver: max_radians must be positive (id=" + std::to_string(s.id) + ")");
     }
-    resolution_.push_back(static_cast<double>(s.ticks) / s.max_radians);
-  }
-  packet_handler_ = dynamixel::PacketHandler::getPacketHandler(1.0);
+    resolution_.push_back(static_cast<double>(s.ticks) / s.max_radians); // Calculate resolution as ticks per radian
+  }                                                                      // Initialize packet handler for Dynamixel Protocol 1.0 (used by AX-series servos)
+  packet_handler_ = dynamixel::PacketHandler::getPacketHandler(1.0);     // Note: Protocol 2.0 is not compatible with AX-series servos, so we use 1.0 here
 }
 
-ServoDriver::~ServoDriver() { closePort(); }
+ServoDriver::~ServoDriver() { closePort(); } // Ensure the serial port is closed and resources are cleaned up when the ServoDriver is destroyed
 
 // ---------------------------------------------------------------------------
-// Unit conversion
+// Unit conversion between radians and servo ticks
 // ---------------------------------------------------------------------------
-uint16_t ServoDriver::radianToTick(double radian, int servo_index) const
+uint16_t ServoDriver::radianToTick(double radian, int servo_index) const  // Convert a desired position in radians to the corresponding servo tick value based on the servo's configuration and resolution
 {
-  const ServoConfig& s   = servos_.at(servo_index);
-  const double       res = resolution_.at(servo_index);
-  double raw = static_cast<double>(s.center)
-             + static_cast<double>(s.sign) * (radian - s.offset) * res;
-  int clamped = static_cast<int>(std::round(raw));
-  clamped = std::max(0, std::min(clamped, s.ticks));
+  const ServoConfig& s   = servos_.at(servo_index);                       // Get the servo configuration for the specified index
+  const double       res = resolution_.at(servo_index);                   // Get the precomputed resolution (ticks per radian) for this servo
+  double raw = static_cast<double>(s.center)                              // Calculate the raw tick value by applying the resolution and offset, and considering the sign for direction control
+             + static_cast<double>(s.sign) * (radian - s.offset) * res;   // Clamp the raw tick value to the valid range of [0, s.ticks] to prevent sending out-of-range values to the servo
+  int clamped = static_cast<int>(std::round(raw));                        // Round the raw tick value to the nearest integer and clamp it to the valid range of [0, s.ticks]
+  clamped = std::max(0, std::min(clamped, s.ticks));                      // Return the clamped tick value as an unsigned 16-bit integer
   return static_cast<uint16_t>(clamped);
 }
+// Example: For an AX-18A servo with 1024 ticks for a full rotation (2.61799 radians), a center at 512 ticks, and no offset, the resolution would be approximately 390.625 ticks per radian. 
+// If we want to set the servo to 1 radian, the raw tick value would be 512 + 1 * 390.625 = 902.625, which would be rounded to 903 ticks.
 
-double ServoDriver::tickToRadian(uint16_t tick, int servo_index) const
+double ServoDriver::tickToRadian(uint16_t tick, int servo_index) const    // Convert a servo tick value back to radians using the servo's configuration and resolution
 {
   const ServoConfig& s   = servos_.at(servo_index);
   const double       res = resolution_.at(servo_index);
@@ -55,7 +57,7 @@ double ServoDriver::tickToRadian(uint16_t tick, int servo_index) const
        + s.offset;
 }
 
-size_t ServoDriver::getServoCount() const { return servos_.size(); }
+size_t ServoDriver::getServoCount() const { return servos_.size(); }      // Return the number of servos managed by this driver, which is determined by the size of the servos_ vector
 
 // ---------------------------------------------------------------------------
 // Hardware — port

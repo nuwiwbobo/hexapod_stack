@@ -32,27 +32,27 @@ struct LegParams {
 };
 
 // Foot position in body frame
-struct FootPosition {
-  double x, y, z;
+struct FootPosition {    // x, y, z; // Position of the foot in 3D space relative to the body frame
+  double x, y, z;        // x: forward/backward, y: left/right, z: up/down
 };
 
 // Joint angles for one leg
-struct LegJoints {
-  double coxa, femur, tibia;
+struct LegJoints {           // coxa, femur, tibia; // Angles of the coxa, femur, and tibia joints in radians
+  double coxa, femur, tibia; // Coxa: rotation around vertical axis, Femur: rotation around horizontal axis, Tibia: rotation around horizontal axis
 };
 
 // IK solve result status
-enum class IKStatus { SUCCESS, UNREACHABLE, ERROR };
+enum class IKStatus { SUCCESS, UNREACHABLE, ERROR };  // SUCCESS: valid solution found, UNREACHABLE: foot position is beyond leg's reach, ERROR: invalid input or computation error
 
 // Complete IK result
-struct IKResult {
-  IKStatus status;
-  LegJoints joints;
+struct IKResult {                                     // Struct to hold the result of the inverse kinematics computation, including the status and the computed joint angles
+  IKStatus status;                                    // Status of the IK solution (e.g., SUCCESS, UNREACHABLE, ERROR)
+  LegJoints joints;                                   // The computed joint angles for the coxa, femur, and tibia if the status is SUCCESS; otherwise, these may be set to NaN or ignored                     
 };
 
 class IkSolver {
 public:
-  explicit IkSolver(const LegParams& params);
+  explicit IkSolver(const LegParams& params);         // Constructor that takes the physical parameters of the leg to initialize the IK solver
 
   // =========================================================================
   // TODO: Implement these methods

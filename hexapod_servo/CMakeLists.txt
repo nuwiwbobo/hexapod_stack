@@ -46,10 +46,17 @@ target_include_directories(servo_node_exec PRIVATE
 target_link_libraries(servo_node_exec servo_driver yaml-cpp)
 ament_target_dependencies(servo_node_exec rclcpp sensor_msgs std_msgs)
 
+add_executable(read_positions_exec src/read_positions.cpp)
+target_include_directories(read_positions_exec PRIVATE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+target_link_libraries(read_positions_exec yaml-cpp)
+ament_target_dependencies(read_positions_exec rclcpp sensor_msgs ament_index_cpp)
+
 # =============================================================================
 # Install
 # =============================================================================
-install(TARGETS servo_driver servo_node_exec
+install(TARGETS servo_driver servo_node_exec read_positions_exec
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}

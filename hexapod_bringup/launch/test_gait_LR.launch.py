@@ -1,0 +1,14 @@
+import os
+from ament_index_python.packages import get_package_share_directory
+from launch import LaunchDescription
+from launch_ros.actions import Node
+
+def generate_launch_description():
+    pkg = get_package_share_directory('hexapod_bringup')
+    config = os.path.join(pkg, 'config', 'test_LR.yaml')
+    return LaunchDescription([
+        Node(package='hexapod_servo', executable='servo_node_exec', name='servo_node',
+             parameters=[{'config_file': config}], output='screen'),
+        Node(package='hexapod_bringup', executable='gait_test_node', name='gait_test_node',
+             parameters=[{'config_file': config, 'leg_key': 'LR'}], output='screen'),
+    ])

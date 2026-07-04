@@ -44,10 +44,24 @@ target_include_directories(ik_node_exec PRIVATE
 target_link_libraries(ik_node_exec ik_solver yaml-cpp)
 ament_target_dependencies(ik_node_exec rclcpp sensor_msgs geometry_msgs)
 
+add_executable(test_ik_stance_exec src/test_ik_stance.cpp)
+target_include_directories(test_ik_stance_exec PRIVATE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+target_link_libraries(test_ik_stance_exec ik_solver)
+ament_target_dependencies(test_ik_stance_exec rclcpp sensor_msgs)
+
+add_executable(test_all_legs_stance_exec src/test_all_legs_stance.cpp)
+target_include_directories(test_all_legs_stance_exec PRIVATE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+target_link_libraries(test_all_legs_stance_exec ik_solver)
+ament_target_dependencies(test_all_legs_stance_exec rclcpp sensor_msgs)
+
 # =============================================================================
 # Install
 # =============================================================================
-install(TARGETS ik_solver ik_node_exec
+install(TARGETS ik_solver ik_node_exec test_ik_stance_exec test_all_legs_stance_exec
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}
