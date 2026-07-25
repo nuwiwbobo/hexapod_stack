@@ -23,7 +23,7 @@ GaitGenerator::GaitGenerator(const GaitParams& params)
 : params_(params),
   step_counter_(0)
 {
-  default_stance_.fill({0.0, 0.0, 0.0});              // Default foot positions (x, y, z) in the stance phase
+  default_stance_.fill({0.0, 0.10, -0.10});              // Default foot positions (x, y, z) in the stance phase
 }
 
 std::array<FootCommand, 6> GaitGenerator::step(double vx, double vy, double angular)  // vx: forward velocity, vy: lateral velocity, angular: rotational velocity

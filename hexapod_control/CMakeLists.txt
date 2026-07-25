@@ -30,9 +30,36 @@ ament_target_dependencies(control_node_exec
 )
 
 # =============================================================================
+# Gait cycle test executable
+# =============================================================================
+add_executable(test_gait_cycle_exec src/test_gait_cycle.cpp)
+target_include_directories(test_gait_cycle_exec PRIVATE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/../hexapod_ik/include>
+  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/../hexapod_gait/include>
+)
+target_link_libraries(test_gait_cycle_exec ${IK_SOLVER_LIB} ${GAIT_GEN_LIB})
+ament_target_dependencies(test_gait_cycle_exec
+  rclcpp sensor_msgs
+)
+
+# =============================================================================
+# Pose test executable (FK verification, joint sweep)
+# =============================================================================
+add_executable(pose_test_node src/pose_test_node.cpp)
+target_include_directories(pose_test_node PRIVATE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/../hexapod_ik/include>
+)
+target_link_libraries(pose_test_node ${IK_SOLVER_LIB} yaml-cpp)
+ament_target_dependencies(pose_test_node
+  rclcpp sensor_msgs
+)
+
+# =============================================================================
 # Install
 # =============================================================================
-install(TARGETS control_node_exec
+install(TARGETS control_node_exec test_gait_cycle_exec pose_test_node
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 

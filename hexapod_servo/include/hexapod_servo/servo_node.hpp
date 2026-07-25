@@ -42,6 +42,7 @@ private:
   std::vector<double> last_targets_;
   bool port_open_{false};
   std::atomic<bool> shutting_down_{false};
+  int target_msg_count_{0};
 
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr target_sub_;
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr state_pub_;

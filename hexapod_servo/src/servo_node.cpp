@@ -135,7 +135,6 @@ void ServoNode::jointTargetCallback(const sensor_msgs::msg::JointState::SharedPt
 {
   if (!port_open_ || !driver_) return;
 
-  // Start from last known positions (keeps unchanged joints at their current target)
   std::vector<double> targets = last_targets_;
 
   for (size_t i = 0; i < msg->name.size(); ++i) {
@@ -149,7 +148,16 @@ void ServoNode::jointTargetCallback(const sensor_msgs::msg::JointState::SharedPt
     targets[servo_idx] = msg->position[i];
   }
 
-  // Single sync write — all 18 servos in one bus packet
+  if (target_msg_count_ < 3) {
+    RCLCPP_INFO(get_logger(), "Received target msg #%d (%zu joints):", target_msg_count_, msg->name.size());
+    for (size_t i = 0; i < joint_names_.size(); ++i) {
+      uint16_t tick = driver_->radianToTick(targets[i], static_cast<int>(i));
+      RCLCPP_INFO(get_logger(), "  %s: rad=%.3f -> tick=%u",
+        joint_names_[i].c_str(), targets[i], tick);
+    }
+  }
+  target_msg_count_++;
+
   if (!driver_->setGoalPositions(targets)) {
     RCLCPP_WARN_THROTTLE(get_logger(), *get_clock(), 1000,
       "Sync write failed (some servos may not respond)");

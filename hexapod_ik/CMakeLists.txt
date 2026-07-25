@@ -22,9 +22,16 @@ target_compile_features(ik_solver PUBLIC cxx_std_17)
 # =============================================================================
 if(BUILD_TESTING)
   find_package(ament_cmake_gtest REQUIRED)
+
   ament_add_gtest(test_ik_solver test/test_ik_solver.cpp)
   target_link_libraries(test_ik_solver ik_solver)
   target_include_directories(test_ik_solver PRIVATE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  )
+
+  ament_add_gtest(test_per_leg_ik test/test_per_leg_ik.cpp)
+  target_link_libraries(test_per_leg_ik ik_solver)
+  target_include_directories(test_per_leg_ik PRIVATE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
   )
 endif()
@@ -58,10 +65,17 @@ target_include_directories(test_all_legs_stance_exec PRIVATE
 target_link_libraries(test_all_legs_stance_exec ik_solver)
 ament_target_dependencies(test_all_legs_stance_exec rclcpp sensor_msgs)
 
+add_executable(test_leg_ik_seq_exec src/test_leg_ik_seq.cpp)
+target_include_directories(test_leg_ik_seq_exec PRIVATE
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+)
+target_link_libraries(test_leg_ik_seq_exec ik_solver)
+ament_target_dependencies(test_leg_ik_seq_exec rclcpp sensor_msgs)
+
 # =============================================================================
 # Install
 # =============================================================================
-install(TARGETS ik_solver ik_node_exec test_ik_stance_exec test_all_legs_stance_exec
+install(TARGETS ik_solver ik_node_exec test_ik_stance_exec test_all_legs_stance_exec test_leg_ik_seq_exec
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}

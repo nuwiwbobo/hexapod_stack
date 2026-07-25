@@ -67,3 +67,19 @@ hexapod_control:
     RM: ["coxa_joint_RM", "femur_joint_RM", "tibia_joint_RM"]
     LR: ["coxa_joint_LR", "femur_joint_LR", "tibia_joint_LR"]
     RR: ["coxa_joint_RR", "femur_joint_RR", "tibia_joint_RR"]
+
+body_frame:
+  LF: { mount_x:  0.07, mount_y:  0.12, coxa_angle_deg:  60.0 }
+  RF: { mount_x: -0.07, mount_y:  0.12, coxa_angle_deg: -60.0 }
+  LM: { mount_x:  0.09, mount_y:  0.00, coxa_angle_deg:  90.0 }
+  RM: { mount_x: -0.09, mount_y:  0.00, coxa_angle_deg: -90.0 }
+  LR: { mount_x:  0.07, mount_y: -0.12, coxa_angle_deg: 120.0 }
+  RR: { mount_x: -0.07, mount_y: -0.12, coxa_angle_deg: -120.0 }
+
+pose_test:
+  publish_rate: 20.0
+  sweep_amplitude: 0.4
+  sweep_period: 6.0
+  foot_spread: 0.10
+  stance_height: 0.10
+  start_mode: "coxa"
